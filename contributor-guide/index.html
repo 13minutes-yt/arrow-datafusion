@@ -35,7 +35,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Communication" href="communication.html" />
-    <link rel="prev" title="Extending DataFusion’s operators: custom LogicalPlan and Execution Plans" href="../library-user-guide/extending-operators.html" />
+    <link rel="prev" title="Profiling Cookbook" href="../library-user-guide/profiling.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="en">
     
@@ -269,6 +269,11 @@
    Extending DataFusion’s operators: custom LogicalPlan and Execution Plans
   </a>
  </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../library-user-guide/profiling.html">
+   Profiling Cookbook
+  </a>
+ </li>
 </ul>
 <p aria-level="2" class="caption" role="heading">
  <span class="caption-text">
@@ -329,7 +334,7 @@
   </div>
 
   <a class="navbar-brand" href="../index.html">
-    <img src="../_static/images/DataFusion-Logo-Background-White.png" class="logo" alt="logo">
+    <img src="../_static/images/2x_bgwhite_original.png" class="logo" alt="logo">
   </a>
 </nav>
 
@@ -448,6 +453,11 @@
      <li class="toc-h3 nav-item toc-entry">
       <a class="reference internal nav-link" href="#parquet-sql-benchmarks">
        Parquet SQL Benchmarks
+      </a>
+     </li>
+     <li class="toc-h3 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#comparing-baselines">
+       Comparing Baselines
       </a>
      </li>
      <li class="toc-h3 nav-item toc-entry">
@@ -745,6 +755,21 @@ and tries to follow the Rust standard <a class="reference external" href="https:
 <p>If the environment variable <code class="docutils literal notranslate"><span class="pre">PARQUET_FILE</span></code> is set, the benchmark will run queries against this file instead of a randomly generated one. This can be useful for performing multiple runs, potentially with different code, against the same source data, or for testing against a custom dataset.</p>
 <p>The benchmark will automatically remove any generated parquet file on exit, however, if interrupted (e.g. by CTRL+C) it will not. This can be useful for analysing the particular file after the fact, or preserving it to use with <code class="docutils literal notranslate"><span class="pre">PARQUET_FILE</span></code> in subsequent runs.</p>
 </section>
+<section id="comparing-baselines">
+<h3>Comparing Baselines<a class="headerlink" href="#comparing-baselines" title="Link to this heading">¶</a></h3>
+<p>By default, Criterion.rs will compare the measurements against the previous run (if any). Sometimes it’s useful to keep a set of measurements around for several runs. For example, you might want to make multiple changes to the code while comparing against the master branch. For this situation, Criterion.rs supports custom baselines.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">git</span> <span class="n">checkout</span> <span class="n">main</span>
+ <span class="n">cargo</span> <span class="n">bench</span> <span class="o">--</span><span class="n">bench</span> <span class="n">sql_planner</span> <span class="o">--</span> <span class="o">--</span><span class="n">save</span><span class="o">-</span><span class="n">baseline</span> <span class="n">main</span>
+ <span class="n">git</span> <span class="n">checkout</span> <span class="n">YOUR_BRANCH</span>
+ <span class="n">cargo</span> <span class="n">bench</span> <span class="o">--</span><span class="n">bench</span> <span class="n">sql_planner</span> <span class="o">--</span>  <span class="o">--</span><span class="n">baseline</span> <span class="n">main</span>
+</pre></div>
+</div>
+<p>Note: For MacOS it may be required to run <code class="docutils literal notranslate"><span class="pre">cargo</span> <span class="pre">bench</span></code> with <code class="docutils literal notranslate"><span class="pre">sudo</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">cargo</span> <span class="n">bench</span> <span class="o">...</span>
+</pre></div>
+</div>
+<p>More information on <a class="reference external" href="https://bheisler.github.io/criterion.rs/book/user_guide/command_line_options.html#baselines">Baselines</a></p>
+</section>
 <section id="upstream-benchmark-suites">
 <h3>Upstream Benchmark Suites<a class="headerlink" href="#upstream-benchmark-suites" title="Link to this heading">¶</a></h3>
 <p>Instructions and tooling for running upstream benchmark suites against DataFusion can be found in <a class="reference external" href="https://github.com/apache/arrow-datafusion/tree/main/benchmarks">benchmarks</a>.</p>
@@ -757,32 +782,37 @@ and tries to follow the Rust standard <a class="reference external" href="https:
 <h3>How to add a new scalar function<a class="headerlink" href="#how-to-add-a-new-scalar-function" title="Link to this heading">¶</a></h3>
 <p>Below is a checklist of what you need to do to add a new scalar function to DataFusion:</p>
 <ul class="simple">
-<li><p>Add the actual implementation of the function:</p>
+<li><p>Add the actual implementation of the function to a new module file within:</p>
 <ul>
-<li><p><a class="reference external" href="https://github.com/apache/arrow-datafusion/blob/main/datafusion/physical-expr/src/string_expressions.rs">here</a> for string functions</p></li>
-<li><p><a class="reference external" href="https://github.com/apache/arrow-datafusion/blob/main/datafusion/physical-expr/src/math_expressions.rs">here</a> for math functions</p></li>
-<li><p><a class="reference external" href="https://github.com/apache/arrow-datafusion/blob/main/datafusion/physical-expr/src/datetime_expressions.rs">here</a> for datetime functions</p></li>
-<li><p>create a new module <a class="reference external" href="https://github.com/apache/arrow-datafusion/blob/main/datafusion/physical-expr/src">here</a> for other functions</p></li>
+<li><p><a class="reference external" href="https://github.com/apache/arrow-datafusion/blob/main/datafusion/functions-array/src">here</a> for array functions</p></li>
+<li><p><a class="reference external" href="https://github.com/apache/arrow-datafusion/blob/main/datafusion/functions/src/crypto">here</a> for crypto functions</p></li>
+<li><p><a class="reference external" href="https://github.com/apache/arrow-datafusion/blob/main/datafusion/functions/src/datetime">here</a> for datetime functions</p></li>
+<li><p><a class="reference external" href="https://github.com/apache/arrow-datafusion/blob/main/datafusion/functions/src/encoding">here</a> for encoding functions</p></li>
+<li><p><a class="reference external" href="https://github.com/apache/arrow-datafusion/blob/main/datafusion/functions/src/math">here</a> for math functions</p></li>
+<li><p><a class="reference external" href="https://github.com/apache/arrow-datafusion/blob/main/datafusion/functions/src/regex">here</a> for regex functions</p></li>
+<li><p><a class="reference external" href="https://github.com/apache/arrow-datafusion/blob/main/datafusion/functions/src/string">here</a> for string functions</p></li>
+<li><p><a class="reference external" href="https://github.com/apache/arrow-datafusion/blob/main/datafusion/functions/src/unicode">here</a> for unicode functions</p></li>
+<li><p>create a new module <a class="reference external" href="https://github.com/apache/arrow-datafusion/blob/main/datafusion/functions/src">here</a> for other functions.</p></li>
 </ul>
 </li>
-<li><p>In <a class="reference external" href="https://github.com/apache/arrow-datafusion/blob/main/datafusion/physical-expr/src/functions.rs">physical-expr/src</a>, add:</p>
+<li><p>New function modules - for example a <code class="docutils literal notranslate"><span class="pre">vector</span></code> module, should use a <a class="reference external" href="https://doc.rust-lang.org/cargo/reference/features.html">rust feature</a> (for example <code class="docutils literal notranslate"><span class="pre">vector_expressions</span></code>) to allow DataFusion
+users to enable or disable the new module as desired.</p></li>
+<li><p>The implementation of the function is done via implementing <code class="docutils literal notranslate"><span class="pre">ScalarUDFImpl</span></code> trait for the function struct.</p>
 <ul>
-<li><p>a new variant to <code class="docutils literal notranslate"><span class="pre">BuiltinScalarFunction</span></code></p></li>
-<li><p>a new entry to <code class="docutils literal notranslate"><span class="pre">FromStr</span></code> with the name of the function as called by SQL</p></li>
-<li><p>a new line in <code class="docutils literal notranslate"><span class="pre">return_type</span></code> with the expected return type of the function, given an incoming type</p></li>
-<li><p>a new line in <code class="docutils literal notranslate"><span class="pre">signature</span></code> with the signature of the function (number and types of its arguments)</p></li>
-<li><p>a new line in <code class="docutils literal notranslate"><span class="pre">create_physical_expr</span></code>/<code class="docutils literal notranslate"><span class="pre">create_physical_fun</span></code> mapping the built-in to the implementation</p></li>
-<li><p>tests to the function.</p></li>
+<li><p>See the <a class="reference external" href="https://github.com/apache/arrow-datafusion/blob/main/datafusion-examples/examples/advanced_udf.rs">advanced_udf.rs</a> example for an example implementation</p></li>
+<li><p>Add tests for the new function</p></li>
+</ul>
+</li>
+<li><p>To connect the implementation of the function add to the mod.rs file:</p>
+<ul>
+<li><p>a <code class="docutils literal notranslate"><span class="pre">mod</span> <span class="pre">xyz;</span></code> where xyz is the new module file</p></li>
+<li><p>a call to <code class="docutils literal notranslate"><span class="pre">make_udf_function!(..);</span></code></p></li>
+<li><p>an item in <code class="docutils literal notranslate"><span class="pre">export_functions!(..);</span></code></p></li>
 </ul>
 </li>
 <li><p>In <a class="reference external" href="https://github.com/apache/arrow-datafusion/blob/main/datafusion/sqllogictest/test_files">sqllogictest/test_files</a>, add new <code class="docutils literal notranslate"><span class="pre">sqllogictest</span></code> integration tests where the function is called through SQL against well known data and returns the expected result.</p>
 <ul>
 <li><p>Documentation for <code class="docutils literal notranslate"><span class="pre">sqllogictest</span></code> <a class="reference external" href="https://github.com/apache/arrow-datafusion/blob/main/datafusion/sqllogictest/README.md">here</a></p></li>
-</ul>
-</li>
-<li><p>In <a class="reference external" href="https://github.com/apache/arrow-datafusion/blob/main/datafusion/expr/src/expr_fn.rs">expr/src/expr_fn.rs</a>, add:</p>
-<ul>
-<li><p>a new entry of the <code class="docutils literal notranslate"><span class="pre">unary_scalar_expr!</span></code> macro for the new function.</p></li>
 </ul>
 </li>
 <li><p>Add SQL reference documentation <a class="reference external" href="https://github.com/apache/arrow-datafusion/blob/main/docs/source/user-guide/sql/scalar_functions.md">here</a></p></li>
@@ -796,7 +826,7 @@ and tries to follow the Rust standard <a class="reference external" href="https:
 <ul>
 <li><p><a class="reference external" href="https://github.com/apache/arrow-datafusion/blob/main/datafusion/physical-expr/src/string_expressions.rs">here</a> for string functions</p></li>
 <li><p><a class="reference external" href="https://github.com/apache/arrow-datafusion/blob/main/datafusion/physical-expr/src/math_expressions.rs">here</a> for math functions</p></li>
-<li><p><a class="reference external" href="https://github.com/apache/arrow-datafusion/blob/main/datafusion/physical-expr/src/datetime_expressions.rs">here</a> for datetime functions</p></li>
+<li><p><a class="reference external" href="https://github.com/apache/arrow-datafusion/blob/main/datafusion/functions/src/datetime/mod.rs">here</a> for datetime functions</p></li>
 <li><p>create a new module <a class="reference external" href="https://github.com/apache/arrow-datafusion/blob/main/datafusion/physical-expr/src">here</a> for other functions</p></li>
 </ul>
 </li>
@@ -890,11 +920,11 @@ taplo<span class="w"> </span><span class="m">0</span>.9.0
               
               <!-- Previous / next buttons -->
 <div class='prev-next-area'>
-    <a class='left-prev' id="prev-link" href="../library-user-guide/extending-operators.html" title="previous page">
+    <a class='left-prev' id="prev-link" href="../library-user-guide/profiling.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
             <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title">Extending DataFusion’s operators: custom LogicalPlan and Execution Plans</p>
+            <p class="prev-next-title">Profiling Cookbook</p>
         </div>
     </a>
     <a class='right-next' id="next-link" href="communication.html" title="next page">

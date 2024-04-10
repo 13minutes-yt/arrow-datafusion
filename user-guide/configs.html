@@ -269,6 +269,11 @@
    Extending DataFusion’s operators: custom LogicalPlan and Execution Plans
   </a>
  </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../library-user-guide/profiling.html">
+   Profiling Cookbook
+  </a>
+ </li>
 </ul>
 <p aria-level="2" class="caption" role="heading">
  <span class="caption-text">
@@ -329,7 +334,7 @@
   </div>
 
   <a class="navbar-brand" href="../index.html">
-    <img src="../_static/images/DataFusion-Logo-Background-White.png" class="logo" alt="logo">
+    <img src="../_static/images/2x_bgwhite_original.png" class="logo" alt="logo">
   </a>
 </nav>
 
@@ -525,7 +530,7 @@ Environment variables are read during <code class="docutils literal notranslate"
 <td><p>Target maximum number of rows in each row group (defaults to 1M rows). Writing larger row groups requires more memory to write, but can get better compression and be faster to read.</p></td>
 </tr>
 <tr class="row-odd"><td><p>datafusion.execution.parquet.created_by</p></td>
-<td><p>datafusion version 36.0.0</p></td>
+<td><p>datafusion version 37.0.0</p></td>
 <td><p>Sets “created by” property</p></td>
 </tr>
 <tr class="row-even"><td><p>datafusion.execution.parquet.column_index_truncate_length</p></td>
@@ -601,8 +606,8 @@ Environment variables are read during <code class="docutils literal notranslate"
 <td><p>Should sub directories be ignored when scanning directories for data files. Defaults to true (ignores subdirectories), consistent with Hive. Note that this setting does not affect reading partitioned tables (e.g. <code class="docutils literal notranslate"><span class="pre">/table/year=2021/month=01/data.parquet</span></code>).</p></td>
 </tr>
 <tr class="row-even"><td><p>datafusion.execution.enable_recursive_ctes</p></td>
-<td><p>false</p></td>
-<td><p>Should DataFusion support recursive CTEs Defaults to false since this feature is a work in progress and may not behave as expected</p></td>
+<td><p>true</p></td>
+<td><p>Should DataFusion support recursive CTEs</p></td>
 </tr>
 <tr class="row-odd"><td><p>datafusion.optimizer.enable_distinct_aggregation_soft_limit</p></td>
 <td><p>true</p></td>
@@ -692,15 +697,19 @@ Environment variables are read during <code class="docutils literal notranslate"
 <td><p>false</p></td>
 <td><p>When set to true, the explain statement will print operator statistics for physical plans</p></td>
 </tr>
-<tr class="row-odd"><td><p>datafusion.sql_parser.parse_float_as_decimal</p></td>
+<tr class="row-odd"><td><p>datafusion.explain.show_sizes</p></td>
+<td><p>true</p></td>
+<td><p>When set to true, the explain statement will print the partition sizes</p></td>
+</tr>
+<tr class="row-even"><td><p>datafusion.sql_parser.parse_float_as_decimal</p></td>
 <td><p>false</p></td>
 <td><p>When set to true, SQL parser will parse float as decimal type</p></td>
 </tr>
-<tr class="row-even"><td><p>datafusion.sql_parser.enable_ident_normalization</p></td>
+<tr class="row-odd"><td><p>datafusion.sql_parser.enable_ident_normalization</p></td>
 <td><p>true</p></td>
 <td><p>When set to true, SQL parser will normalize ident (convert ident to lowercase when not quoted)</p></td>
 </tr>
-<tr class="row-odd"><td><p>datafusion.sql_parser.dialect</p></td>
+<tr class="row-even"><td><p>datafusion.sql_parser.dialect</p></td>
 <td><p>generic</p></td>
 <td><p>Configure the SQL dialect used by DataFusion’s parser; supported values include: Generic, MySQL, PostgreSQL, Hive, SQLite, Snowflake, Redshift, MsSQL, ClickHouse, BigQuery, and Ansi.</p></td>
 </tr>

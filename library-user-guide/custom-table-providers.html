@@ -269,6 +269,11 @@
    Extending DataFusion’s operators: custom LogicalPlan and Execution Plans
   </a>
  </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="profiling.html">
+   Profiling Cookbook
+  </a>
+ </li>
 </ul>
 <p aria-level="2" class="caption" role="heading">
  <span class="caption-text">
@@ -329,7 +334,7 @@
   </div>
 
   <a class="navbar-brand" href="../index.html">
-    <img src="../_static/images/DataFusion-Logo-Background-White.png" class="logo" alt="logo">
+    <img src="../_static/images/2x_bgwhite_original.png" class="logo" alt="logo">
   </a>
 </nav>
 
@@ -482,6 +487,10 @@
 <span class="p">}</span>
 
 <span class="k">impl</span><span class="w"> </span><span class="n">ExecutionPlan</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">CustomExec</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">fn</span> <span class="nf">name</span><span class="p">(</span><span class="o">&amp;</span><span class="bp">self</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="s">&quot;CustomExec&quot;</span>
+<span class="w">    </span><span class="p">}</span>
+
 <span class="w">    </span><span class="k">fn</span> <span class="nf">execute</span><span class="p">(</span>
 <span class="w">        </span><span class="o">&amp;</span><span class="bp">self</span><span class="p">,</span>
 <span class="w">        </span><span class="n">_partition</span>: <span class="kt">usize</span><span class="p">,</span>
